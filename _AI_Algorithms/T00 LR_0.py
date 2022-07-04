@@ -4,7 +4,7 @@
 # In[ ]:
 
 
-get_ipython().system('pip install keras')
+#!pip install keras
 
 import pandas as pd
 from heading import *
@@ -113,7 +113,7 @@ for i in range(length):
     index_int = index_int.replace("[", "") ## CHANGE TO INT
     index_int = index_int.replace("]", "") ## CHANGE TO INT
     index_int = int(index_int) ## CHANGE TO INT
-    index_int = index_int + 1 ## ADD '1' AS INT TO ALL ELEMENTS IN LIST (SHIFT IN INDEX(n)) _ SEE "aima-data/R_DF_Analysis.csv"
+    index_int = index_int + 1 ## ADD '1' AS INT TO ALL ELEMENTS IN LIST (SHIFT RIGHT IN INDEX(n)) _ SEE "aima-data/R_DF_Analysis.csv"
     NC_List_Ind_0.append(index_int) ## APPEND TO NEW INT_LIST
     #int(index_int)
 
@@ -168,7 +168,7 @@ train_label = []
 test_data = []
 test_label = []
 
-train_data, train_label, test_data, test_label = seperate_train_and_test_data(goog_PC.examples, (length_PC/2))
+train_data, train_label, test_data, test_label = seperate_train_and_test_data(goog_PC.examples, (length_PC/1.3))
 
 #
 
@@ -198,78 +198,51 @@ for x in futureSample_data:
 # In[ ]:
 
 
-goog_NC = DataSet(name="R_DF_Analysis_NC", target='Adj Close', attr_names=AdjClose_NC_List)
-#house = DataSet(name="HousingData", target='HousePrice', attr_names='HouseAge HouseSize HousePrice')
+### SAVE OUTPUTS FOR TEST ACC >= 0.999 __ LOOP OVER
 
-print(goog_NC.examples[0])
-print(goog_NC.examples[:3])
+n = 0
+ls = []
 
-train_data = []
-train_label = []
-test_data = []
-test_label = []
+while n != 20:
+    ##
+    goog_PC = DataSet(name="R_DF_Analysis_PC", target='Adj Close', attr_names=AdjClose_PC_List)
+    #
+    train_data = []
+    train_label = []
+    test_data = []
+    test_label = []
+    #
+    train_data, train_label, test_data, test_label = seperate_train_and_test_data(goog_PC.examples, (length_PC/1.3))
+    #
+    futureSample_data =[]
+    futureSample_label = []
+    futureSample_data= test_data[-2:]
+    futureSample_label= test_label[-2:]
+    #
+    test_data =test_data[:-2]
+    test_label =test_label[:-2]
+    #
+    lr = LinearRegression()
+    lr.fit(train_data,train_label)
+    #
+    train_accuracy= lr.score(train_data, train_label)
+    test_accuracy= lr.score(test_data, test_label)
+    #
+    #for x in futureSample_data:
+        #print(x,lr.predict([x]))
+    ##
+    if test_accuracy >= 0.9995:
+        print("T_" + str(n))
+        print(test_accuracy)
+        #for x in futureSample_data:
+            #print(x,lr.predict([x]))
+        print(lr.predict([x]))
+        ls.append(int(lr.predict([x])))
+        #print(ls)
+        # SAVE [print(x,lr.predict([x]))]
+        n = n + 1
 
-train_data, train_label, test_data, test_label = seperate_train_and_test_data(goog_NC.examples, (length_NC/2))
-
-#
-
-futureSample_data =[]
-futureSample_label = []
-futureSample_data= test_data[-2:]
-futureSample_label= test_label[-2:]
-
-test_data =test_data[:-2]
-test_label =test_label[:-2]
-
-lr = LinearRegression()
-
-lr.fit(train_data,train_label)
-
-train_accuracy= lr.score(train_data, train_label)
-print (train_accuracy)
-
-# TEST ACCURACY
-test_accuracy= lr.score(test_data, test_label)
-print (test_accuracy)
-
-for x in futureSample_data:
-    print(x,lr.predict([x]))
-
-
-# In[ ]:
-
-
-#goog = DataSet(name="R_DF_Analysis", target='AdjClose', attr_names='AdjClose_PC_List[0] OPM_0 OPER_MARGIN_VALUE PM_0 ROA_0 ROI_0 ROE_VALUE ROC_0 ROCE_0 EV_1_VALUE EV_2_VALUE EBIT_DEFAULT EBIT_VALUE EBIT_VALUE_0 EBITDA_DEFAULT EBITDA_VALUE EBITDA_VALUE_0 EV_1_EBITDA_VALUE EV_2_EBITDA_VALUE EV_1_EBITDA_VALUE_0 EV_2_EBITDA_VALUE_0 EV_1_EBITDA_DEFAULT EV_2_EBITDA_DEFAULT EPS_VALUE DPS_VALUE DPS_00 DPS_02 DPS_03 DPS_10 DPS_12 DPS_13 DPS_20 DPS_22 DPS_23 PE_1_VALUE PE_2_0_VALUE PE_2_1_VALUE PE_00 PE_01 PE_02 RR_0 RR_2 RR_3 DY_1_VALUE DY_2_VALUE DY_2_VALUE_00 DY_2_VALUE_03 DY_2_VALUE_03 DY_2_VALUE_04 DY_2_VALUE_06 DY_2_VALUE_07 DY_2_VALUE_08 DY_2_VALUE_10 DY_2_VALUE_11 DY_0 DY_0_00 DY_0_02 DY_0_03 DY_0_04 DY_0_06 DY_0_07 DY_0_08 DY_0_10 DY_0_11 Div_VALUE Div_VALUE_1 Div_VALUE_2 PSD_0 MCAP_VALUE BV_0 MB_0 MVPS_0 MVPS_PRICE_0 BVPS_0 SGR_0 SGR_2 SGR_3 RD_VALUE Cur_R_VALUE QR_1_VALUE QR_2_VALUE QR_VALUE Cas_R_VALUE NWC_VALUE NWC_TA_VALUE IM_VALUE DE_VALUE DE_VALUE_0 NE_VALUE_0 DE_DEFAULT NE_DEFAULT DR_VALUE ER_VALUE DER_VALUE EM_VALUE FE_VALUE LTDR_VALUE TIE_VALUE CC_VALUE DSCR_VALUE EQUITY_MULTIPLIER Tax_VALUE FCF_0_VALUE FCF_1_VALUE FCF_2_VALUE FCF_3_VALUE FCF_DEFAULT IT_VALUE DSI_VALUE RT_VALUE DSR_VALUE TOT_ASSET_TURNOVER TATO_VALUE CI_VALUE FAT_VALUE NWCT_VALUE Open High Low Close AdjClose Volume')
-#house = DataSet(name="HousingData", target='HousePrice', attr_names='HouseAge HouseSize HousePrice')
-#print(goog)
-
-#print(goog.examples[0])
-#print(goog.examples[:3])
-
-#train_data = []
-#train_label = []
-#test_data = []
-#test_label = []
-
-#train_data, train_label, test_data, test_label = seperate_train_and_test_data(goog.examples, 10)
-
-#futureSample_data =[]
-#futureSample_label = []
-#futureSample_data= test_data[-2:]
-#futureSample_label= test_label[-2:]
-#test_data =test_data[:-2]
-#test_label =test_label[:-2]
-
-#lr = LinearRegression()
-#lr.fit(train_data,train_label)
-
-#train_accuracy= lr.score(train_data, train_label)
-#print (train_accuracy)
-#test_accuracy= lr.score(test_data, test_label)
-#print (test_accuracy)
-
-#for x in futureSample_data:
-    #print(x,lr.predict([x]))
+print(ls)
 
 
 # In[ ]:
@@ -277,6 +250,44 @@ for x in futureSample_data:
 
 # PLOT LR_00 RESULTS
 # USE MACHINE LEARNING, ITERATIONS OVER TRAINING && TESTING
+
+
+# In[ ]:
+
+
+import numpy as np
+import matplotlib as mpl
+import matplotlib.pyplot as plt
+
+df = pd.read_csv("../Alphabet Inc (GOOG)/S5 _ CSV z.##/R_DF_Analysis_PC.csv", header = None)
+
+
+
+#############
+#i = 0
+#for column in df:
+    #df_0 = df[column]
+    #df_0.reset_index()
+    #df_0.to_csv("aima-data/column_" + str(i) + ".csv")
+    #print("aima-data/column_" + str(i))
+    #print(df_0)
+    #i = i + 1
+    #df_0.plot.scatter(x = 'index', y = column)
+#############
+
+
+    
+# ADD DATETIME TO LEFT OF DATAFRAME
+# CALCULATE LENGTH (NUMBER OF COLUMNS) == (length_PC + 1)
+
+#for i in range(length_PC_0)
+
+ax1 = df.plot(kind='scatter', x='0', y='1', color='r')    
+ax2 = df.plot(kind='scatter', x='0', y='2', color='g', ax=ax1)    
+ax3 = df.plot(kind='scatter', x='0', y='3', color='b', ax=ax1)
+# (...)
+
+#print(ax1 == ax2 == ax3)  # True
 
 
 # In[ ]:
